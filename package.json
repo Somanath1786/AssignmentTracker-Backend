@@ -1,0 +1,31 @@
+{
+  "name": "assignmenttracker-backend",
+  "version": "1.0.0",
+  "description": "Test backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "reset-db": "node ./db/seeds"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Somanath1786/AssignmentTracker-Backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Somanath1786/AssignmentTracker-Backend/issues"
+  },
+  "homepage": "https://github.com/Somanath1786/AssignmentTracker-Backend#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.6.10",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.19.1"
+  }
+}
