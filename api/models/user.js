@@ -17,7 +17,10 @@ const schema = mongoose.Schema({
         type : String,
         required : true
     },
-    isAdmin : Boolean
+    isAdmin : {
+        type : Boolean,
+        default : false
+    }
     },
     { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 )

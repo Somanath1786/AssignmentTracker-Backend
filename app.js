@@ -15,12 +15,12 @@ require('./db/connection')()
 if (NODE_ENV === 'development') app.use(require('morgan')('dev'))
 app.use(require('body-parser').json())
 
-// TODO: For getting user profile add middleware to attach token to request
+// For getting user profile add middleware to attach token to request
+app.use(require('./api/middleware/set-token'))
 
 // Routes
 app.use('/api', require('./api/routes/auth'))
-
-
+app.use('/api/user', require('./api/routes/user'))
 
 // Not Found Handler
 app.use((req, res, next) => {
