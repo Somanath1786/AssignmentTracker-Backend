@@ -19,4 +19,20 @@ router.get('/students' , async (req, res, next) =>{
     }
 })
 
+router.get('/:userId/assignments', async (req, res, next) => {
+    try{
+        const payload = decodeToken(req.token)
+        //const query = {_id : req.params.userId}
+        const fields = {'assignments' : 1, '_id' : 0}
+        const allAssignments = await User.findById(req.params.userId, fields)
+        const status = 200
+        res.json({status, allAssignments})
+    } catch(e) {
+        console.error(e)
+        const error = new Error('You are not authorized to access this route.')
+        error.status = 401
+        next(error)
+    }
+})
+
 module.exports = router

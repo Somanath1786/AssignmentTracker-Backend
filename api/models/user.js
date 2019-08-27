@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Assignment = require('./assignments')
 
 const schema = mongoose.Schema({
     firstname : {
@@ -20,7 +21,8 @@ const schema = mongoose.Schema({
     isAdmin : {
         type : Boolean,
         default : false
-    }
+    },
+    assignments : [Assignment]
     },
     { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 )
