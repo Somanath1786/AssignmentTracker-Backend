@@ -8,7 +8,7 @@ router.get('/students' , async (req, res, next) =>{
         const payload = decodeToken(req.token)
         const query = { isAdmin : false }
         var students=[];
-
+        console.log(req.query)
         const response = await User.find(query)
         for(var i = 0; i < response.length; i++)
         {
@@ -23,13 +23,28 @@ router.get('/students' , async (req, res, next) =>{
                     totalMaxScore+= student.assignments[j].maxScore
                 }
             }
-            console.log(student.firstname, student.lastname, student.emailAddress, totalScore, totalMaxScore)
-            students.push({ "firstname" : student.firstname,
+
+            if (req.query.minScore && req.query.maxScore) {
+                console.log(totalScore, req.query.minScore, req.query.maxScore)
+                if ((totalScore > req.query.minScore) && (totalScore < req.query.maxScore)) {
+                    console.log(student.firstname, student.lastname, student.emailAddress, totalScore, totalMaxScore)
+                    students.push({ "firstname" : student.firstname,
                             "lastname" : student.lastname,
                             "emailAddress" : student.emailAddress,
                             "score" : totalScore,
                             "maxScore" : totalMaxScore
                             })
+                }
+            }
+            else {
+                console.log(student.firstname, student.lastname, student.emailAddress, totalScore, totalMaxScore)
+                students.push({ "firstname" : student.firstname,
+                                "lastname" : student.lastname,
+                                "emailAddress" : student.emailAddress,
+                                "score" : totalScore,
+                                "maxScore" : totalMaxScore
+                                })
+            }
         }
 
         const status = 200
@@ -45,6 +60,11 @@ router.get('/students' , async (req, res, next) =>{
 router.get('/admin/assignments/' , async (req, res, next) => {
     try {
         const payload = decodeToken(req.token)
+        const user = await User.findById(payload.id)
+        if (user.isAdmin === false)
+        {
+            throw('You are not allowed to access this route')
+        }
         const query = { isAdmin : false }
         var assignments = []
         const response = await User.find(query)
@@ -64,6 +84,7 @@ router.get('/admin/assignments/' , async (req, res, next) => {
                         maxScore = student.assignments[j].maxScore
                         assignments.push({ "firstname" : student.firstname,
                                             "lastname" : student.lastname,
+                                            "userId" : student._id,
                                             "_id" : student.assignments[j]._id,
                                             "title" : student.assignments[j].title,
                                             "link" : student.assignments[j].link,
@@ -79,6 +100,7 @@ router.get('/admin/assignments/' , async (req, res, next) => {
                     {
                         assignments.push({ "firstname" : student.firstname,
                                             "lastname" : student.lastname,
+                                            "userId" : student._id,
                                             "_id" : student.assignments[j]._id,
                                             "title" : student.assignments[j].title,
                                             "link" : student.assignments[j].link,
@@ -122,6 +144,37 @@ router.get('/:userId/assignments/:assignmentId', async (req, res, next) => {
                                             {assignments : {$elemMatch : {_id :  req.params.assignmentId}}})
         const status = 200
         res.json({status, assignment})
+    } catch(e) {
+        console.error(e)
+        const error = new Error('You are not authorized to access this route.')
+        error.status = 401
+        next(error)
+    }
+})
+
+router.patch('/admin/assignments/:assignmentId', async (req, res, next) => {
+    try {
+        const payload = decodeToken(req.token)
+        var user = await User.find({"_id" : req.body.userId})
+        const student = user[0]
+        console.log(req.params.assignmentId)
+        console.log(student)
+        for(var i = 0; i < student.assignments.length; i++)
+        {
+            if (JSON.stringify(student.assignments[i]._id) === JSON.stringify(req.params.assignmentId))
+            {
+                console.log('Found assignment')
+                student.assignments[i].score = req.body.score
+                student.assignments[i].maxScore = req.body.maxScore
+                break;
+            }
+        }
+
+        const saveResponse = await student.save()
+        status = 200
+        const respone = 'Scores Update Successful'
+
+        res.json({status, respone})
     } catch(e) {
         console.error(e)
         const error = new Error('You are not authorized to access this route.')
